@@ -1,12 +1,27 @@
-// photoModel.js
 const mongoose = require('mongoose');
 
-const photoSchema = new mongoose.Schema({
-  filename: { type: String, required: true },
-  uploadDate: { type: Date, default: Date.now },
-  uploader: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Reference to the user who uploaded the photo
+const imageSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    img: {
+        data: Buffer,
+        contentType: String
+    },
+    uploadDate: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-const Photo = mongoose.model('Photo', photoSchema);
-
-module.exports = Photo;
+module.exports = mongoose.model('Image', imageSchema);
