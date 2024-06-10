@@ -7,8 +7,8 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 require('dotenv').config();
 
-const User = require('./models/userModel'); 
-const Image = require('./models/photoModel'); 
+const User = require('./models/userModel');
+const Image = require('./models/photoModel');
 
 const app = express();
 const port = 3001;
@@ -21,15 +21,19 @@ const { MongoClient } = require('mongodb');
 
 const checkDatabaseStatus = async (url) => {
   const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-  await client.connect();
-  const adminDb = client.db().admin();
-  const dbStats = await adminDb.command({ dbStats: 1 });
-  await client.close();
-  return {
-    url,
-    freeSpace: dbStats.storageSize - dbStats.dataSize,
-    isFree: dbStats.dataSize < 500000000, // Example threshold: 1GB
-  };
+  try {
+    await client.connect();
+    const db = client.db();
+    const stats = await db.stats();
+    const freeSpace = stats.storageSize - stats.dataSize;
+    const isFree = stats.dataSize < 500000000; 
+    return { url, freeSpace, isFree };
+  } catch (error) {
+    console.error(`Failed to check database status for ${url}:`, error);
+    return { url, freeSpace: 0, isFree: false };
+  } finally {
+    await client.close();
+  }
 };
 
 const findFreeDB = async (MONGO_URL1, MONGO_URL2, MONGO_URL3) => {
@@ -41,14 +45,13 @@ const findFreeDB = async (MONGO_URL1, MONGO_URL2, MONGO_URL3) => {
     throw new Error('No free databases available');
   }
 
-  // Sort freeDBs by free space in descending order
+  
   freeDBs.sort((a, b) => b.freeSpace - a.freeSpace);
-
-  // Return the URL of the database with the most free space
+  console.log(freeDBs)
+  
   return freeDBs[0].url;
 };
 
-// Add your MONGO_URLs here
 const MONGO_URL1 = process.env.MONGO_URL1;
 const MONGO_URL2 = process.env.MONGO_URL2;
 const MONGO_URL3 = process.env.MONGO_URL3;
@@ -69,8 +72,6 @@ app.post('/upload', upload.array('photos'), async (req, res) => {
   try {
     const { useremail } = req.body;
     let dbUrl;
-
-    // Check if user exists in any of the databases
     let user = await User.findOne({ email: useremail }).catch(() => null);
 
     if (!user) {
@@ -78,12 +79,12 @@ app.post('/upload', upload.array('photos'), async (req, res) => {
       await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
       user = await User.create({ email: useremail });
     } else {
-      dbUrl = MONGO_URL1; // or the URL where the user was found
+      dbUrl = MONGO_URL1; 
     }
 
     await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 
-    // Save each uploaded image to the database
+    
     for (let file of req.files) {
       const obj = {
         user: user._id,

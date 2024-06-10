@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema({
     images: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Image'
-    }]
+    }],
+    /* db_id: {
+        type: Number,
+        required: true,
+    } */
     // Additional fields can be added here
 });
 
