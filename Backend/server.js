@@ -28,7 +28,7 @@ const checkDatabaseStatus = async (url) => {
   return {
     url,
     freeSpace: dbStats.storageSize - dbStats.dataSize,
-    isFree: dbStats.dataSize < 1000000000, // Example threshold: 1GB
+    isFree: dbStats.dataSize < 500000000, // Example threshold: 1GB
   };
 };
 
@@ -71,23 +71,17 @@ app.post('/upload', upload.array('photos'), async (req, res) => {
     let dbUrl;
 
     // Check if user exists in any of the databases
-    const userInDb1 = await User.findOne({ email: useremail }).catch(() => null);
-    const userInDb2 = await User.findOne({ email: useremail }).catch(() => null);
-    const userInDb3 = await User.findOne({ email: useremail }).catch(() => null);
+    let user = await User.findOne({ email: useremail }).catch(() => null);
 
-    let user = userInDb1 || userInDb2 || userInDb3;
-
-    if (user) {
-      dbUrl = userInDb1 ? MONGO_URL1 : userInDb2 ? MONGO_URL2 : MONGO_URL3;
-    } else {
+    if (!user) {
       dbUrl = await findFreeDB(MONGO_URL1, MONGO_URL2, MONGO_URL3);
+      await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+      user = await User.create({ email: useremail });
+    } else {
+      dbUrl = MONGO_URL1; // or the URL where the user was found
     }
 
     await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
-
-    if (!user) {
-      user = await User.create({ email: useremail });
-    }
 
     // Save each uploaded image to the database
     for (let file of req.files) {
@@ -98,8 +92,11 @@ app.post('/upload', upload.array('photos'), async (req, res) => {
           contentType: file.mimetype
         }
       };
-      await Image.create(obj);
+      const image = await Image.create(obj);
+      user.images.push(image._id);
     }
+
+    await user.save();
 
     res.send('Files uploaded and saved successfully!');
   } catch (err) {

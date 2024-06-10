@@ -5,7 +5,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    }
+    },
+    images: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Image'
+    }]
     // Additional fields can be added here
 });
 
