@@ -3,10 +3,9 @@ import axios from "axios";
 
 const UploadComponent: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  const [username, setUsername] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [useremail, setUseremail] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [waiting, setwaiting] = useState(false);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -15,15 +14,14 @@ const UploadComponent: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFiles || !username || !title || !description) return;
+    setwaiting(true);
+    if (!selectedFiles || !useremail) return;
 
     const formData = new FormData();
     Array.from(selectedFiles).forEach((file) => {
       formData.append("photos", file);
     });
-    formData.append("username", username);
-    formData.append("title", title);
-    formData.append("description", description);
+    formData.append("useremail", useremail);
 
     try {
       const response = await axios.post(
@@ -36,9 +34,11 @@ const UploadComponent: React.FC = () => {
         }
       );
       if (response.status === 200) {
+        setwaiting(false);
         setUploadSuccess(true);
       }
     } catch (error) {
+      setwaiting(false);
       console.error("Error uploading files:", error);
     }
   };
@@ -47,32 +47,11 @@ const UploadComponent: React.FC = () => {
     <div>
       <div>
         <label>
-          Username:
+          Useremail:
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Title:
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Description:
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={useremail}
+            onChange={(e) => setUseremail(e.target.value)}
             required
           />
         </label>
@@ -81,6 +60,7 @@ const UploadComponent: React.FC = () => {
         <input type="file" multiple onChange={handleFileChange} />
       </div>
       <button onClick={handleUpload}>Upload Pic</button>
+      {waiting && <p>uploading files please wait...</p>}
       {uploadSuccess && <p>Files uploaded successfully!</p>}
     </div>
   );

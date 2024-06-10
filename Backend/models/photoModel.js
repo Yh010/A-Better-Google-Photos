@@ -6,14 +6,6 @@ const imageSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    title: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
     img: {
         data: Buffer,
         contentType: String
