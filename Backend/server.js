@@ -35,7 +35,7 @@ const checkDatabaseStatus = async (url) => {
     await client.close();
   }
 };
-
+//TODO: ADD DB_ID TO USERS 
 const findFreeDB = async (MONGO_URL1, MONGO_URL2, MONGO_URL3) => {
   const mongoUrls = [MONGO_URL1, MONGO_URL2, MONGO_URL3];
   const dbStatuses = await Promise.all(mongoUrls.map(checkDatabaseStatus));
