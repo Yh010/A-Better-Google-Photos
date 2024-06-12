@@ -1,12 +1,12 @@
 import "./App.css";
 import Navbar from "./components/Navbar/Navbar";
-import UploadComponent from "./components/UploadButton/UploadButton";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
     <div>
       <Navbar />
-      <UploadComponent />
+      <LandingPage />
     </div>
   );
 }
