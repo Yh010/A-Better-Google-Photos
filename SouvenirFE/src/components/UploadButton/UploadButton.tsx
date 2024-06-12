@@ -1,21 +1,54 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
+import LandingPageAlert from "../Alerts/LandingPageAlert";
 
 const UploadComponent: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [useremail, setUseremail] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [waiting, setwaiting] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  const [alertOn, setAlertOn] = useState(false);
+  const [alertMsg, setAlertMsg] = useState("");
+
+  const [emailAlert, setEmailAlert] = useState(false);
+  const [photoAlert, setPhotoAlert] = useState(false);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setSelectedFiles(event.target.files);
+      setPhotoAlert(false);
     }
   };
 
   const handleUpload = async () => {
-    setwaiting(true);
-    if (!selectedFiles || !useremail) return;
+    setWaiting(true);
+    if (!selectedFiles || !useremail) {
+      if (!selectedFiles && !useremail) {
+        setAlertMsg("User Email and Photos");
+        setAlertOn(true);
+
+        setEmailAlert(true);
+        setPhotoAlert(true);
+        setWaiting(false);
+        return;
+      } else if (!useremail) {
+        setAlertMsg("User Email");
+        setAlertOn(true);
+
+        setEmailAlert(true);
+        setPhotoAlert(false);
+        setWaiting(false);
+        return;
+      } else {
+        setAlertMsg("Photos");
+        setAlertOn(true);
+
+        setEmailAlert(false);
+        setPhotoAlert(true);
+        setWaiting(false);
+        return;
+      }
+    }
 
     const formData = new FormData();
     Array.from(selectedFiles).forEach((file) => {
@@ -34,14 +67,37 @@ const UploadComponent: React.FC = () => {
         }
       );
       if (response.status === 200) {
-        setwaiting(false);
         setUploadSuccess(true);
       }
     } catch (error) {
-      setwaiting(false);
       console.error("Error uploading files:", error);
+    } finally {
+      setWaiting(false);
     }
   };
+
+  // useEffect to clear the alert message after 5 seconds
+  useEffect(() => {
+    if (alertOn || emailAlert || photoAlert) {
+      const timer = setTimeout(() => {
+        setAlertOn(false);
+        setAlertMsg("");
+        setEmailAlert(false);
+        setPhotoAlert(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertOn, emailAlert, photoAlert]);
+
+  // useEffect to reset upload success message after 5 seconds
+  useEffect(() => {
+    if (uploadSuccess) {
+      const timer = setTimeout(() => {
+        setUploadSuccess(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadSuccess]);
 
   return (
     <div>
@@ -55,12 +111,14 @@ const UploadComponent: React.FC = () => {
             required
           />
         </label>
+        {emailAlert && <LandingPageAlert msg={alertMsg} />}
       </div>
       <div>
         <input type="file" multiple onChange={handleFileChange} />
+        {photoAlert && <LandingPageAlert msg={alertMsg} />}
       </div>
       <button onClick={handleUpload}>Upload Pic</button>
-      {waiting && <p>uploading files please wait...</p>}
+      {!alertOn && waiting && <p>Uploading files, please wait...</p>}
       {uploadSuccess && <p>Files uploaded successfully!</p>}
     </div>
   );
