@@ -102,14 +102,18 @@ const UploadComponent: React.FC = () => {
   return (
     <div>
       <div>
-        <label>
-          Useremail:
-          <input
-            type="text"
-            value={useremail}
-            onChange={(e) => setUseremail(e.target.value)}
-            required
-          />
+        <label className="block text-sm font-medium leading-6 text-gray-900">
+          <div className=" flex relative mt-2 rounded-md shadow-sm">
+            <p className="m-3">Input your email here </p>
+
+            <input
+              type="text"
+              value={useremail}
+              onChange={(e) => setUseremail(e.target.value)}
+              required
+              className="block  rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-slate-600 sm:text-sm sm:leading-6"
+            />
+          </div>
         </label>
         {emailAlert && <LandingPageAlert msg={alertMsg} />}
       </div>

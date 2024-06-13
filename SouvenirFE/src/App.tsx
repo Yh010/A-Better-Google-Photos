@@ -1,4 +1,5 @@
 import "./App.css";
+import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar/Navbar";
 import LandingPage from "./pages/LandingPage";
 
@@ -7,6 +8,7 @@ function App() {
     <div>
       <Navbar />
       <LandingPage />
+      <Footer />
     </div>
   );
 }
