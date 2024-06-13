@@ -1,13 +1,14 @@
 import "./App.css";
+import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar/Navbar";
-import UploadComponent from "./components/UploadButton/UploadButton";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
     <div>
       <Navbar />
-
-      <UploadComponent />
+      <LandingPage />
+      <Footer />
     </div>
   );
 }
