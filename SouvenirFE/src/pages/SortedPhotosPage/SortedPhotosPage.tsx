@@ -31,9 +31,6 @@ export default function SortedPhotosPage() {
           <Link underline="hover" color="inherit" href="#">
             Individuals
           </Link>
-          <Link underline="hover" color="inherit" href="#">
-            John Doe
-          </Link>
         </Breadcrumbs>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-6">
           <Link href="#" className="group">
