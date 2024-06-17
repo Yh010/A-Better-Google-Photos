@@ -12,8 +12,11 @@
   "dependencies": {
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.19.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.3",
+    "@mui/material": "^5.15.20",
     "@radix-ui/react-navigation-menu": "^1.1.4",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.2",
