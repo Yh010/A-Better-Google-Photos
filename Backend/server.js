@@ -18,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const { MongoClient } = require('mongodb');
+const { default: loadModels } = require('./hooks/loadModels');
 
 const checkDatabaseStatus = async (url) => {
   const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -65,6 +66,11 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
+
+ const recognzSinglePic = () => {
+  loadModels()
+}
+
 
 const upload = multer({ storage: storage });
 
